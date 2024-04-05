@@ -111,186 +111,93 @@ class _HomePageState extends State<HomeScreen> {
             SizedBox(
               height: 20,
             ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2.0,
-                    blurRadius: 5.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Camera'),
-                onTap: () {
-                  // Handle camera action
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => CameraPage()));
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () {
+                // Handle camera action
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CameraPage()));
+              },
             ),
             const Divider(),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2.0,
-                    blurRadius: 5.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.palette),
-                title: const Text('Theme'),
-                onTap: () {
-                  // Handle theme change action
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.palette),
+              title: const Text('Theme'),
+              onTap: () {
+                // Handle theme change action
+              },
             ),
             const Divider(),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2.0,
-                    blurRadius: 5.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.history),
-                title: const Text('History'),
-                onTap: () {
-                  // Handle history action
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.history),
+              title: const Text('History'),
+              onTap: () {
+                // Handle history action
+              },
             ),
             const Divider(),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2.0,
-                    blurRadius: 5.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.feedback_outlined),
-                title: const Text('Feedback'),
-                onTap: () {
-                  // Handle notification settings action
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.feedback_outlined),
+              title: const Text('Feedback'),
+              onTap: () {
+                // Handle notification settings action
+              },
             ),
             const Divider(),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2.0,
-                    blurRadius: 5.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.help_outline),
-                title: const Text('Help'),
-                onTap: () {
-                  // Handle help and feedback action
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.help_outline),
+              title: const Text('Help'),
+              onTap: () {
+                // Handle help and feedback action
+              },
             ),
             const Divider(),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2.0,
-                    blurRadius: 5.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.lock_outline),
-                title: const Text('Privacy Policy'),
-                onTap: () {
-                  // Handle privacy policy action
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.lock_outline),
+              title: const Text('Privacy Policy'),
+              onTap: () {
+                // Handle privacy policy action
+              },
             ),
             const Divider(),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2.0,
-                    blurRadius: 5.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-                border: Border.all(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.logout),
-                title: const Text('Logout'),
-                onTap: () async {
-                  auth.signOut().then((value) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (contex) => LoginPage()));
-                  }).onError((error, stackTrace) {
-                    Utils().toastMessage(error.toString());
-                  });
-                },
-              ),
+            ListTile(
+              leading: const Icon(Icons.logout_outlined),
+              title: Text('Logout'),
+              onTap: () {
+                // Perform logout validation
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Logout'),
+                      content: Text('Are you sure you want to logout?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            // Perform logout
+                            FirebaseAuth.instance.signOut();
+                            // Navigate to the sign-in screen
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                              ),
+                            );
+                          },
+                          child: Text('Logout'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),
