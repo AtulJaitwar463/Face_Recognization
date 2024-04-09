@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 
 class DeblureResultPage extends StatefulWidget {
   final String deblurredImagePath;
-  const DeblureResultPage({super.key, required this.deblurredImagePath});
-
+  const DeblureResultPage({Key? key, required this.deblurredImagePath}) : super(key: key);
 
   @override
-  State<DeblureResultPage> createState() => _DeblureResultPageState();
+  _DeblureResultPageState createState() => _DeblureResultPageState();
 }
 
 class _DeblureResultPageState extends State<DeblureResultPage> {
@@ -17,7 +16,7 @@ class _DeblureResultPageState extends State<DeblureResultPage> {
         title: Text('Deblurred Image'),
       ),
       body: Center(
-        //child: Image.network(deblurredImagePath), // Display deblurred image
+        child: Image.network(widget.deblurredImagePath), // Updated to use the widget property
       ),
     );
   }

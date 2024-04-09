@@ -68,7 +68,8 @@ class _CameraPageState extends State<CameraPage> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData && snapshot.data != null) {
-                  return Container(
+                  return
+                Container(
                     width: 320,
                     height: 320,
                     decoration: BoxDecoration(

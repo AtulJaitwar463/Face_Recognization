@@ -1,6 +1,10 @@
+import 'package:face_recogniization/DrawerScreen/feedback.dart';
+import 'package:face_recogniization/DrawerScreen/helpSupport_page.dart';
+import 'package:face_recogniization/DrawerScreen/privacy_policy_page.dart';
+import 'package:face_recogniization/DrawerScreen/theme_page.dart';
 import 'package:face_recogniization/Screens/camera_page.dart';
 import 'package:face_recogniization/Screens/profile_page.dart';
-import 'package:face_recogniization/Screens/image_display_screen.dart';
+import 'package:face_recogniization/Screens/upload_image_page.dart';
 import 'package:face_recogniization/Screens/video_page.dart';
 import 'package:face_recogniization/Utils/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -125,7 +129,9 @@ class _HomePageState extends State<HomeScreen> {
               leading: const Icon(Icons.palette),
               title: const Text('Theme'),
               onTap: () {
-                // Handle theme change action
+                 // Handle theme change action
+                // Navigator.push(context,
+                //     MaterialPageRoute(builder: (context) => ));
               },
             ),
             const Divider(),
@@ -142,6 +148,8 @@ class _HomePageState extends State<HomeScreen> {
               title: const Text('Feedback'),
               onTap: () {
                 // Handle notification settings action
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => FeedbackPage()));
               },
             ),
             const Divider(),
@@ -150,6 +158,8 @@ class _HomePageState extends State<HomeScreen> {
               title: const Text('Help'),
               onTap: () {
                 // Handle help and feedback action
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => HelpAndSupportPage()));
               },
             ),
             const Divider(),
@@ -158,6 +168,8 @@ class _HomePageState extends State<HomeScreen> {
               title: const Text('Privacy Policy'),
               onTap: () {
                 // Handle privacy policy action
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => PrivacyPolicyPage()));
               },
             ),
             const Divider(),
@@ -224,33 +236,35 @@ class _HomePageState extends State<HomeScreen> {
                     children: [
                       for (final videoData in [
                         {
-                          'url': 'assets/facevideo1.mp4',
-                          'thumbnail': 'assets/thumb1.jpeg'
+                          'url':
+                          'https://youtu.be/pQvkoaevVMk?si=cAL9YJITYpDCCGUo',
+                          'thumbnail':
+                          'https://i.ytimg.com/vi/GEBgXQIWOAc/maxresdefault.jpg'
                         },
                         {
-                          'url': 'assets/facevideo2.mp4',
-                          'thumbnail': 'assets/thumb2.jpeg'
+                          'url':
+                          'https://youtu.be/1d7u8wTmA80?si=-YeK4Dvpjfv_FhjP',
+                          'thumbnail': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMXackfrf061PB-Uq7AHtyzS19AmpEd-_M-g&s'
                         },
-                        // Add more video URLs and thumbnails here
+                        // Add more YouTube video URLs and thumbnails here
                       ])
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    VideoPage(videoUrl: videoData['url'] ?? ''),
+                                builder: (context) => VideoPlayerPage(
+                                  videoUrl: videoData['url'] ?? '',
+                                ),
                               ),
                             );
-                            child:
-                            Icon(Icons.arrow_forward_ios);
                           },
                           child: Container(
                             margin: EdgeInsets.all(8.0),
                             width: 200,
                             height: 150,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(15.0),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.grey.withOpacity(0.5),
@@ -263,16 +277,26 @@ class _HomePageState extends State<HomeScreen> {
                                 color: Colors.white,
                                 width: 1.0,
                               ),
-                              image: DecorationImage(
-                                image: AssetImage(videoData['thumbnail'] ?? ''),
-                                fit: BoxFit.cover,
-                              ),
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Image.network(
+                                  videoData['thumbnail'] ?? '',
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                                Icon(Icons.play_circle_fill,
+                                    size: 50, color: Colors.white),
+                              ],
                             ),
                           ),
                         ),
                     ],
                   ),
                 ),
+
                 const Padding(
                   padding: EdgeInsets.all(16.0),
                 ),
@@ -285,16 +309,15 @@ class _HomePageState extends State<HomeScreen> {
                       for (final videoData in [
                         {
                           'url':
-                              'https://www.youtube.com/watch?v=_a6DcgkEZcM&pp=ygUFc29uZ3M%3D',
+                          'https://youtu.be/AJjU7lXU0po?si=bBzNFbpZEPl1MHnl',
                           'thumbnail':
-                              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsW8ZsU941R0tTmAuleI0b2GHavTawfuh-eQ&usqp=CAU'
+                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSHTAh1mClNRHwvFnWe5QC0cIOwAR4Ald8C3g&s'
                         },
                         {
                           'url':
-                              'https://youtu.be/xFXGlMpgXOk?si=RhieF6aW2ku3KiTq',
-                          'thumbnail':
-                              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsW8ZsU941R0tTmAuleI0b2GHavTawfuh-eQ&usqp=CAU'
-                        },
+                          'https://youtu.be/j-arrSiCs9A?si=bv1uzZ9s9mg5q31z',
+                          'thumbnail': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDl8K3rpfJHnJ5gX6fS0HhTKSU_Y4qoVxgq8YJbpgd3A&s'
+                          },
                         // Add more YouTube video URLs and thumbnails here
                       ])
                         GestureDetector(
@@ -470,7 +493,7 @@ class _HomePageState extends State<HomeScreen> {
                     onPressed: () async {
                       final ImagePicker _picker = ImagePicker();
                       final XFile? image =
-                          await _picker.pickImage(source: ImageSource.gallery);
+                      await _picker.pickImage(source: ImageSource.gallery);
                       if (image != null) {
                         Navigator.push(
                           context,
@@ -487,7 +510,7 @@ class _HomePageState extends State<HomeScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  VideoPlayerWidget(videoPath: video.path),
+                                  VideoPlayerPage(videoUrl: '',)
                             ),
                           );
                         }

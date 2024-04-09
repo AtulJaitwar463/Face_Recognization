@@ -93,7 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 15,
                 ),
                 Text(
-                  "YOur logo",
+                  " ",
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
 
