@@ -3,14 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:crypto/crypto.dart';
-import 'package:face_recogniization/Screens/deblure_result_page.dart';
+import 'package:path_provider/path_provider.dart';
 
-import '../Widgets/round_button.dart';
-import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
-import 'package:async/async.dart';
+//import 'detection_screen.dart';
 
 class MediaDisplayPage extends StatefulWidget {
   final String? imagePath;
@@ -23,112 +18,139 @@ class MediaDisplayPage extends StatefulWidget {
 
 class _MediaDisplayPageState extends State<MediaDisplayPage> {
   bool loading = false;
-  // final String apiKey = 'wEkwOnGVOPGB3iG6ha3R8uLlzJ5zfX29eSlqh8tAkFjLcKLY';
-  // String? outputImageUrl;
-  //
-  // Future<void> _processDeblur(BuildContext context) async {
-  //   if (widget.imagePath != null) {
-  //     setState(() {
-  //       loading = true;
-  //     });
-  //
-  //     try {
-  //       File imageFile = File(widget.imagePath!);
-  //       final bytes = await imageFile.readAsBytes();
-  //       final md5Hash = md5.convert(bytes);
-  //       final imageMd5 = md5Hash.toString();
-  //       final encodedImageMd5 = base64Encode(utf8.encode(imageMd5));
-  //
-  //       final submitTaskResponse = await http.post(
-  //         Uri.parse('https://developer.remini.ai/api/tasks'),
-  //         headers: {
-  //           'Authorization': 'Bearer $apiKey',
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: jsonEncode({
-  //           'tools': [
-  //             {'type': 'face_enhance', 'mode': 'beautify'},
-  //             {'type': 'background_enhance', 'mode': 'base'},
-  //           ],
-  //           'image_md5': encodedImageMd5,
-  //           'image_content_type': 'image/jpeg',
-  //           'output_content_type': 'image/jpeg',
-  //         }),
-  //       );
-  //
-  //       if (submitTaskResponse.statusCode == 200) {
-  //         final submitTaskData = jsonDecode(submitTaskResponse.body);
-  //         final String taskId = submitTaskData['task_id'];
-  //
-  //         final processTaskResponse = await http.post(
-  //           Uri.parse('https://developer.remini.ai/api/tasks/$taskId/process'),
-  //           headers: {'Authorization': 'Bearer $apiKey'},
-  //         );
-  //
-  //         if (processTaskResponse.statusCode == 202) {
-  //           // Polling for task completion
-  //           while (outputImageUrl == null) {
-  //             await Future.delayed(Duration(seconds: 5));
-  //             outputImageUrl = await _checkTaskStatus(taskId);
-  //           }
-  //
-  //           if (outputImageUrl != null) {
-  //             Navigator.push(
-  //               context,
-  //               MaterialPageRoute(
-  //                 builder: (context) => DeblureResultPage(deblurredImagePath: outputImageUrl!),
-  //               ),
-  //             );
-  //           } else {
-  //             print('Error: Unable to fetch output image URL');
-  //           }
-  //         }
-  //       }
-  //     } catch (e) {
-  //       print('Error: $e');
-  //     } finally {
-  //       setState(() {
-  //         loading = false;
-  //       });
-  //     }
-  //   }
-  // }
-  // Future<String?> _checkTaskStatus(String taskId) async {
-  //   try {
-  //     final taskStatusResponse = await http.get(
-  //       Uri.parse('https://developer.remini.ai/api/tasks/$taskId'),
-  //       headers: {'Authorization': 'Bearer $apiKey'},
-  //     );
-  //
-  //     if (taskStatusResponse.statusCode == 200) {
-  //       final taskStatusData = jsonDecode(taskStatusResponse.body);
-  //       final String taskStatus = taskStatusData['status'];
-  //
-  //       if (taskStatus == 'completed') {
-  //         return taskStatusData['result']['output_url'];
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print('Error checking task status: $e');
-  //   }
-  //
-  //   return null; // Return null if task is not completed
-  // }
+  String? enhancedImageUrl;
+  late File imageFile;
+  TextEditingController imageNameController = TextEditingController();
 
-  Future<void> uploadImage(File imageFile) async {
-    var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
-    var length = await imageFile.length();
-    var uri = Uri.parse('http://your-fastapi-server/upload/');
-    var request = http.MultipartRequest('POST', uri);
-    var multipartFile = http.MultipartFile('file', stream, length,
-        filename: basename(imageFile.path));
-    request.files.add(multipartFile);
-    var response = await request.send();
-    if (response.statusCode == 200) {
-      print('Image uploaded successfully');
-    } else {
-      print('Error uploading image: ${response.reasonPhrase}');
-      //
+  Future<void> _processDeblur(BuildContext context) async {
+    setState(() {
+      loading = true;
+    });
+
+    try {
+      if (widget.imagePath != null) {
+        final bytes = await File(widget.imagePath!).readAsBytes();
+
+        final response = await http.post(
+          Uri.parse('https://developer.remini.ai/api/tasks'),
+          headers: {
+            'Authorization': 'Bearer 23RXpzbH-Lgb3BXoqIqicxWvSVkwD4Y1qACcCWAGFGhkT85D', // Replace with your Remini API key
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'image_content_type': 'image/jpeg',
+            'version': '1.2',
+            'denoise': true,
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final uploadUrl = data['upload_url'];
+          final uploadHeaders = data['upload_headers'];
+
+          final uploadResponse = await http.put(
+            Uri.parse(uploadUrl),
+            headers: Map<String, String>.from(uploadHeaders),
+            body: bytes,
+          );
+
+          if (uploadResponse.statusCode == 200) {
+            final taskId = data['task_id'];
+            await _processTask(taskId, context);
+            await _checkTaskStatus(taskId, context);
+          } else {
+            throw Exception('Failed to upload image: ${uploadResponse.reasonPhrase}');
+          }
+        } else {
+          throw Exception('Failed to submit task: ${response.reasonPhrase}');
+        }
+      }
+    } catch (e) {
+      print('Error: $e');
+      final snackBar = SnackBar(content: Text('Error: $e'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
+    setState(() {
+      loading = false;
+    });
+  }
+
+  Future<void> _processTask(String taskId, BuildContext context) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://developer.remini.ai/api/tasks/$taskId/process'),
+        headers: {
+          'Authorization': 'Bearer 23RXpzbH-Lgb3BXoqIqicxWvSVkwD4Y1qACcCWAGFGhkT85D', // Replace with your Remini API key
+          'Content-Length': '0',
+        },
+      );
+
+      if (response.statusCode != 202) {
+        throw Exception('Failed to process task: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error processing task: $e');
+      final snackBar = SnackBar(content: Text('Error: $e'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  Future<void> _checkTaskStatus(String taskId, BuildContext context) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://developer.remini.ai/api/tasks/$taskId'),
+        headers: {
+          'Authorization': 'Bearer 23RXpzbH-Lgb3BXoqIqicxWvSVkwD4Y1qACcCWAGFGhkT85D', // Replace with your Remini API key
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final status = data['status'];
+        if (status == 'completed') {
+          final enhancedImageLink = data['result']['output_url'];
+          setState(() {
+            enhancedImageUrl = enhancedImageLink;
+          });
+          final snackBar = SnackBar(content: Text('Enhanced Image downloaded and saved'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+          // Save enhanced image
+          await _saveImage(enhancedImageLink!);
+        } else if (status == 'processing') {
+          await Future.delayed(Duration(seconds: 5));
+          await _checkTaskStatus(taskId, context);
+        } else {
+          throw Exception('Task failed $status: ${data['error'] ?? 'Unknown error'}');
+        }
+      } else {
+        throw Exception('Failed to check task status: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error checking task status: $e');
+      final snackBar = SnackBar(content: Text('Error: $e'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
+  Future<void> _saveImage(String imageUrl) async {
+    try {
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        final appDir = await getApplicationDocumentsDirectory();
+        final filePath = '${appDir.path}/enhanced_image.jpg';
+        final file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        setState(() {
+          imageFile = file;
+        });
+      } else {
+        throw Exception('Failed to download image: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error downloading image: $e');
     }
   }
 
@@ -136,41 +158,60 @@ class _MediaDisplayPageState extends State<MediaDisplayPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Face Detection',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF8A2387),
-                Color(0xFFE94057),
-                Color(0xFFF27121),
-              ],
-            ),
-          ),
-        ),
+        title: Text('Image Display'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (widget.imagePath != null) Image.file(File(widget.imagePath!)),
-            SizedBox(height: 20),
-            RoundButton(
-                title: "DeBlure",
-                loading: loading,
-                onTap: () {
-                  uploadImage;
-                }),
-          ],
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.imagePath != null) Image.file(File(widget.imagePath!)),
+
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  _processDeblur(context);
+                },
+                child: loading ? CircularProgressIndicator() : Text('Deblur'),
+              ),
+
+              if (enhancedImageUrl != null) ...[
+                SizedBox(height: 20),
+                Text('Enter Image Name:'),
+                SizedBox(height: 10),
+                TextField(
+                  controller: imageNameController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter image name...',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Text('Enhanced Image:'),
+                Image.network(
+                  enhancedImageUrl!,
+                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    } else {
+                      return CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                            : null,
+                      );
+                    }
+                  },
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+
+                  },
+                  child: Text('Detect'),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
